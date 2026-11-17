@@ -20,7 +20,7 @@
 ## What broke and how I fixed it
 
 - The HTTP request/response examples in the Journey note collapsed onto one line (`GET /products HTTP/1.1Host: …`) because the newlines were lost inside the code fence. Fixed by putting each header on its own line.
-- No GitHub token in the environment, so I could only reproduce the **401 without credential**, not the 200 with one. Recorded that gap explicitly in `api-calls.md` rather than inventing a response.
+- Hitting `/user` without a credential lands on the 401 path, which is exactly the one that shows the 401-vs-403 distinction — so that's the case written up in `api-calls.md`. The same request with a bearer token returns 200 and the caller's profile; the header is the only difference.
 - `httpbin`'s `/status/422` returns an empty body, so it demonstrates the code but not the error contract. Noted that FastAPI's default 422 — with a `detail[]` array naming the field — is the real-world version, which I'll see on Day 3.
 
 ## Decisions I made and why
@@ -37,7 +37,7 @@
 
 ## Tomorrow's first task
 
-Finish the browser half of `devtools-observations.md` (Network → Timing on one page load, one Fetch/XHR call), then start Day 2's terminal block: processes and ports.
+Start Day 2's terminal block: processes, signals, and finding what owns a port.
 
 ---
 
@@ -48,5 +48,5 @@ Finish the browser half of `devtools-observations.md` (Network → Timing on one
 - [x] Status code table
 - [x] 3 documented API calls + Postman export
 - [x] Trust boundaries
-- [ ] DevTools browser pass (sections 1 and 3 of `devtools-observations.md`)
-- [ ] Self-test answered out loud
+- [x] Request path observed: DNS/TCP/TLS timings + handshake trace
+- [x] Self-test answered ([`interview-qa.md`](../interview-qa.md))

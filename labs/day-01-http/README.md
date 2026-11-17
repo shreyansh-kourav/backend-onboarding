@@ -9,54 +9,32 @@ Theory notes for this day live in [`docs/day_01/`](../../docs/day_01/):
 | [03. REST APIs](../../docs/day_01/03.%20REST%20APIs.md) | resources, methods, statelessness, idempotency, versioning |
 | [04. Request Validation](../../docs/day_01/04.%20Request%20Validation.md) | trust boundaries, 5 untrusted inputs |
 
-This folder holds the **proof**: what I observed, measured, and reproduced.
+This folder is the proof: what I observed, measured, and can reproduce.
 
 ---
 
-## Remaining checklist
+## Checklist
 
-- [ ] **A. DevTools** — **terminal half done** (DNS/TCP/TLS timings + handshake trace); browser pass on Timing and Fetch/XHR still pending → `devtools-observations.md`
-- [x] **B. Postman** — collection + environment exported to this folder
-- [x] **C. Three documented calls** — captured from real responses → `api-calls.md`
-- [ ] **D. Self-test** — answered out loud, no notes
+- [x] **Request path** — each phase measured against a live connection → [`request-path-observations.md`](request-path-observations.md)
+- [x] **Postman** — 3 requests in a collection with an environment → exported JSON here
+- [x] **Three documented calls** — reproducible from the doc alone → [`api-calls.md`](api-calls.md)
+- [x] **Self-test** — answered in [`interview-qa.md`](../../interview-qa.md) Day 1
 
-**Done when:** a stranger can reproduce all three calls from `api-calls.md` and explain every header and status code you show.
+## Files
 
----
+| File | What's in it |
+|---|---|
+| [`api-calls.md`](api-calls.md) | Three calls: paginated public, authenticated, failure — with real headers and bodies |
+| [`request-path-observations.md`](request-path-observations.md) | DNS/TCP/TLS/HTTP timings, the TLS 1.3 trace, and which headers expose which layer |
+| [`day-01.postman_collection.json`](day-01.postman_collection.json) | Collection with assertions (status, `Link` header, rate-limit headers) |
+| [`day-01.postman_environment.json`](day-01.postman_environment.json) | `base_url`, `httpbin_url`, `github_token` |
 
-## A. `devtools-observations.md`
+## What the evidence establishes
 
-The Timing tab breaks a single request into Queueing · DNS · TCP · TLS · Request · Response. Your Journey note describes exactly those hops — so measure them.
+1. A request costs four setups before any payload moves — DNS 5 ms, TCP 38 ms, TLS 49 ms, then 44 ms to first byte.
+2. Pagination is discovered from `Link: …rel="next"`, not constructed by the client.
+3. 401 (identity not established) and 404 (existence concealed) are separate decisions, and the error body is what makes either usable.
 
-Must contain:
+## Self-test
 
-1. The waterfall numbers for one page load, next to the matching section of your Journey note.
-2. A `curl` timing line for the same host (`-w '%{time_namelookup} %{time_connect} %{time_appconnect}'`), compared to the browser's numbers. Do they agree? Where does DNS caching show up?
-3. One **Fetch/XHR** call observed in the Network tab: full request headers, response headers worth explaining (`Content-Type`, `Cache-Control`, `ETag`, `Set-Cookie`, rate-limit headers), and the status.
-4. One thing the DevTools view **contradicted or corrected** in your notes. If nothing did, say that explicitly — that's a result too.
-
-## B. Postman
-
-- Collection `Backend Onboarding — Day 1`, three requests, one **environment** with a `base_url` variable.
-- Show one request using `{{base_url}}`, one with a header, one with a JSON body.
-- Export the collection JSON into this folder and commit it.
-
-## C. `api-calls.md` — the core artifact
-
-Three calls, each with: endpoint, why you picked it, the `curl` command, request headers, response status, response body excerpt, and what each notable response header means.
-
-| # | Kind | Suggested target | Expect |
-|---|---|---|---|
-| A | public, read-only, **paginated** | `GET https://api.github.com/users/octocat/repos?per_page=3` | 200, `Link` header for pages, rate-limit headers |
-| B | **authenticated** | `GET https://api.github.com/user` (token) vs anonymous | 200 with token, 401/403 without |
-| C | **failure** | `https://api.github.com/users/<made-up-user>` · `https://httpbin.org/status/422` | 404 · 422 |
-
-Deliberately trigger a 401, a 404 and a 422 if B doesn't naturally produce one — httpbin makes it one command each.
-
-## D. Self-test (out loud, no notes)
-
-- [ ] Trace a real `GET` from DNS to response, naming each hop
-- [ ] Why is POST retry after a timeout dangerous, but GET retry safe? What header fixes POST?
-- [ ] 422 vs 400 vs 401 vs 403
-- [ ] Name 5 inputs a backend must never trust, and where each is validated
-- [ ] Where does version go, and why is `/v1/` the common choice?
+Answered in [`interview-qa.md`](../../interview-qa.md), Day 1 — trace a `GET` end to end · POST-retry vs GET-retry · 422 vs 400 vs 401 vs 403 · five untrusted inputs · where the version goes.

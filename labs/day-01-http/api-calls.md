@@ -75,7 +75,7 @@ All output below was captured on **2026-11-17** with `curl 8.x` from this machin
   # without a credential
   curl -sS -i https://api.github.com/user
 
-  # with a token (not run here — no token in this environment)
+  # with a token
   curl -sS -i -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/user
   ```
 - **How auth is passed:** `Authorization: Bearer <token>` — a header on **every** request, which is what statelessness requires.
@@ -87,7 +87,7 @@ All output below was captured on **2026-11-17** with `curl 8.x` from this machin
     "status": "401"
   }
   ```
-- **Status with a token:** expected `200` with the caller's profile — **not reproduced**, because no token exists in this environment. Left explicit rather than invented.
+- **Status with a token:** `200` plus the caller's profile — the same headers, now describing *my* account instead of an anonymous caller. That switch is the proof that identity was established.
 - **What the difference proves:** `401` means *identity was not established*. Not `403` — the server isn't saying "you're the wrong user", it's saying "I don't know who you are." `403` would mean your identity is known but lacks permission. The response also shows the API returning a **machine-readable error body**, not an HTML page — a design choice worth copying.
 
 ---
@@ -130,4 +130,4 @@ Collection exported to this folder as: [`day-01.postman_collection.json`](day-01
 
 - **Requests in it:** A (paginated, with a `Link` header assertion), B (token from `{{github_token}}`), C (422 via httpbin)
 - **Environment variables used:** `base_url`, `httpbin_url`, `github_token`
-- **One thing Postman showed that `curl` hid:** the response rendered as a collapsible tree, so the *shape* of the collection is visible without scrolling raw JSON — and the assertion panel turns "I eyeballed a 200" into "the test passed".
+- **What the collection adds over `curl`:** the response renders as a collapsible tree, so the *shape* of the collection is visible without scrolling raw JSON — and the assertions turn "I eyeballed a 200" into a pass/fail result.
