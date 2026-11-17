@@ -1,123 +1,62 @@
-# Day 1 — Web & API basics
+# Day 1 — hands-on evidence
 
-**Artifact:** how a request actually reaches a backend and comes back. Fill every section; leave nothing as a placeholder.
+Theory notes for this day live in [`docs/day_01/`](../../docs/day_01/):
 
-**Done when:** someone who has never seen this repo can reproduce all three API calls from this document alone and explain every status code you chose.
+| Note | Covers |
+|---|---|
+| [01. Journey of a Request](../../docs/day_01/01.%20Journey%20of%20a%20Request.md) | client → DNS → TCP → TLS → HTTP → server |
+| [02. HTTP](../../docs/day_01/02.%20HTTP.md) | message anatomy, 17 status codes |
+| [03. REST APIs](../../docs/day_01/03.%20REST%20APIs.md) | resources, methods, statelessness, idempotency, versioning |
+| [04. Request Validation](../../docs/day_01/04.%20Request%20Validation.md) | trust boundaries, 5 untrusted inputs |
 
----
-
-## 1. Request lifecycle
-
-> One diagram from "user types a URL" to "response rendered". Label DNS, TCP, TLS, HTTP request, server, response. ASCII or an image — both fine.
-
-```text
-TODO
-```
-
-**In one paragraph, what each hop does:**
-
-<!-- TODO -->
+This folder holds the **proof**: what I observed, measured, and reproduced.
 
 ---
 
-## 2. HTTP methods
+## Remaining checklist
 
-| Method | Safe? | Idempotent? | Typical status | When I'd use it |
-|---|---|---|---|---|
-| GET | | | | |
-| POST | | | | |
-| PUT | | | | |
-| PATCH | | | | |
-| DELETE | | | | |
-| HEAD / OPTIONS | | | | |
+- [ ] **A. DevTools** — watch one real request's DNS/TCP/TLS breakdown, map it to the Journey note → `devtools-observations.md`
+- [ ] **B. Postman** — 3 requests in a saved collection with an environment → exported JSON here
+- [ ] **C. Three documented calls** — reproducible from the doc alone → `api-calls.md`
+- [ ] **D. Self-test** — answered out loud, no notes
 
-**Why PUT is idempotent but POST isn't:**
-
-<!-- TODO -->
+**Done when:** a stranger can reproduce all three calls from `api-calls.md` and explain every header and status code you show.
 
 ---
 
-## 3. Status codes
+## A. `devtools-observations.md`
 
-| Code | Name | Use when |
-|---|---|---|
-| 200 | | |
-| 201 | | |
-| 204 | | |
-| 301 / 302 | | |
-| 304 | | |
-| 400 | | |
-| 401 | | |
-| 403 | | |
-| 404 | | |
-| 405 | | |
-| 409 | | |
-| 422 | | |
-| 429 | | |
-| 500 | | |
-| 502 / 503 | | |
+The Timing tab breaks a single request into Queueing · DNS · TCP · TLS · Request · Response. Your Journey note describes exactly those hops — so measure them.
 
-**One of these I triggered myself, and how:** <!-- TODO -->
+Must contain:
 
----
+1. The waterfall numbers for one page load, next to the matching section of your Journey note.
+2. A `curl` timing line for the same host (`-w '%{time_namelookup} %{time_connect} %{time_appconnect}'`), compared to the browser's numbers. Do they agree? Where does DNS caching show up?
+3. One **Fetch/XHR** call observed in the Network tab: full request headers, response headers worth explaining (`Content-Type`, `Cache-Control`, `ETag`, `Set-Cookie`, rate-limit headers), and the status.
+4. One thing the DevTools view **contradicted or corrected** in your notes. If nothing did, say that explicitly — that's a result too.
 
-## 4. Three documented calls
+## B. Postman
 
-### Call A — public, read-only, paginated
-- Endpoint:
-- Why I picked it:
-- `curl` command:
-- Request headers:
-- Response status + headers worth explaining:
-- Response body excerpt:
-- What each response header means:
+- Collection `Backend Onboarding — Day 1`, three requests, one **environment** with a `base_url` variable.
+- Show one request using `{{base_url}}`, one with a header, one with a JSON body.
+- Export the collection JSON into this folder and commit it.
 
-### Call B — authenticated
-- Endpoint:
-- `curl` command:
-- Request headers (how auth is passed):
-- Response status:
-- What happens without the token:
+## C. `api-calls.md` — the core artifact
 
-### Call C — the failure case
-- Endpoint:
-- `curl` command:
-- Status returned:
-- Why the server chose that status:
-- What the body tells the client to fix:
+Three calls, each with: endpoint, why you picked it, the `curl` command, request headers, response status, response body excerpt, and what each notable response header means.
 
-> Postman collection exported to this folder as `*.postman_collection.json`.
-
----
-
-## 5. Trust boundaries
-
-Five things a backend must never trust, and where each is validated:
-
-| # | Input | Where it's validated | What happens if trusted blindly |
+| # | Kind | Suggested target | Expect |
 |---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
+| A | public, read-only, **paginated** | `GET https://api.github.com/users/octocat/repos?per_page=3` | 200, `Link` header for pages, rate-limit headers |
+| B | **authenticated** | `GET https://api.github.com/user` (token) vs anonymous | 200 with token, 401/403 without |
+| C | **failure** | `https://api.github.com/users/<made-up-user>` · `https://httpbin.org/status/422` | 404 · 422 |
 
-**Why client-side validation is UX, not security:**
+Deliberately trigger a 401, a 404 and a 422 if B doesn't naturally produce one — httpbin makes it one command each.
 
-<!-- TODO -->
+## D. Self-test (out loud, no notes)
 
----
-
-## 6. Open questions
-
--
--
--
-
----
-
-## Self-test (answer out loud, no notes)
-
-- [ ] Trace a real `GET` from DNS to response
-- [ ] Why is POST retry after a timeout dangerous, but GET retry safe?
+- [ ] Trace a real `GET` from DNS to response, naming each hop
+- [ ] Why is POST retry after a timeout dangerous, but GET retry safe? What header fixes POST?
 - [ ] 422 vs 400 vs 401 vs 403
+- [ ] Name 5 inputs a backend must never trust, and where each is validated
+- [ ] Where does version go, and why is `/v1/` the common choice?
