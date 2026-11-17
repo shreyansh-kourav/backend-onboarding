@@ -1,0 +1,104 @@
+{
+  "info": {
+    "_postman_id": "d1a0f0c4-0000-4000-8000-000000000001",
+    "name": "Backend Onboarding — Day 1",
+    "description": "Three calls from Day 1: public paginated, authenticated, failure. Uses the companion environment file.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "A — public, paginated",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('is a collection (array)', () => pm.expect(pm.response.json()).to.be.an('array'));",
+              "pm.test('paginated: Link header present', () => pm.response.to.have.header('Link'));",
+              "pm.test('rate limit headers present', () => pm.response.to.have.header('x-ratelimit-remaining'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/vnd.github+json" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/octocat/repos?per_page=3",
+          "host": ["{{base_url}}"],
+          "path": ["users", "octocat", "repos"],
+          "query": [
+            { "key": "per_page", "value": "3" }
+          ]
+        },
+        "description": "Public, no credential. Watch the Link header for rel=next. Re-send with If-None-Match: {{etag}} to get 304."
+      },
+      "response": []
+    },
+    {
+      "name": "B — authenticated (401 without token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 with token, 401 without', () => {",
+              "  const code = pm.response.code;",
+              "  pm.expect([200, 401]).to.include(code);",
+              "});",
+              "pm.test('error body is JSON, not HTML', () => {",
+              "  pm.response.to.have.header('content-type');",
+              "  pm.expect(pm.response.headers.get('content-type')).to.include('application/json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/vnd.github+json" },
+          { "key": "Authorization", "value": "Bearer {{github_token}}", "description": "Leave github_token empty to reproduce the 401." }
+        ],
+        "url": {
+          "raw": "{{base_url}}/user",
+          "host": ["{{base_url}}"],
+          "path": ["user"]
+        },
+        "description": "401 = identity not established. 403 = identity known, permission missing."
+      },
+      "response": []
+    },
+    {
+      "name": "C — failure: 422 with no detail",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"name\": \"\", \"price\": \"not-a-number\" }",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{httpbin_url}}/status/422",
+          "host": ["{{httpbin_url}}"],
+          "path": ["status", "422"]
+        },
+        "description": "httpbin echoes the code with an empty body — the point is that a bare 422 tells the client nothing. FastAPI's real 422 includes detail[] naming the field."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "https://api.github.com" },
+    { "key": "httpbin_url", "value": "https://httpbin.org" },
+    { "key": "github_token", "value": "" }
+  ]
+}

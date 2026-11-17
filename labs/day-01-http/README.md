@@ -15,9 +15,9 @@ This folder holds the **proof**: what I observed, measured, and reproduced.
 
 ## Remaining checklist
 
-- [ ] **A. DevTools** — watch one real request's DNS/TCP/TLS breakdown, map it to the Journey note → `devtools-observations.md`
-- [ ] **B. Postman** — 3 requests in a saved collection with an environment → exported JSON here
-- [ ] **C. Three documented calls** — reproducible from the doc alone → `api-calls.md`
+- [ ] **A. DevTools** — **terminal half done** (DNS/TCP/TLS timings + handshake trace); browser pass on Timing and Fetch/XHR still pending → `devtools-observations.md`
+- [x] **B. Postman** — collection + environment exported to this folder
+- [x] **C. Three documented calls** — captured from real responses → `api-calls.md`
 - [ ] **D. Self-test** — answered out loud, no notes
 
 **Done when:** a stranger can reproduce all three calls from `api-calls.md` and explain every header and status code you show.

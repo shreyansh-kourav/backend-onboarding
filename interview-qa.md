@@ -9,16 +9,26 @@ Format: tick the box, replace the `↳` line with your answer.
 
 ## Day 1 — Web & API basics
 
-- [ ] **What happens between typing a URL and seeing a response?**
-      ↳
-- [ ] **Which HTTP methods are idempotent, and why does it matter for retries?**
-      ↳
-- [ ] **401 vs 403 — what's the difference and why is it a security distinction?**
-      ↳
-- [ ] **What is a trust boundary in a backend?**
-      ↳
-- [ ] **Difference between REST and "an HTTP API"? When would you not use REST?**
-      ↳
+- [x] **What happens between typing a URL and seeing a response?**
+      ↳ DNS: stub resolver → recursive resolver → root → TLD → authoritative, returns an IP (cached at several levels).
+      ↳ TCP 3-way handshake to port 443; TLS 1.3 handshake (ClientHello/ServerHello, certificate check, Finished) derives symmetric keys; ALPN picks h2.
+      ↳ HTTP request (method, path, headers, optional body) → server → status line, headers, body → browser parses and renders.
+- [x] **Which HTTP methods are idempotent, and why does it matter for retries?**
+      ↳ GET, HEAD, PUT, DELETE, OPTIONS repeat without changing state; POST creates a new thing each time.
+      ↳ Idempotency is about server *state*, not the response — a second DELETE may return 404 but nothing changed.
+      ↳ So a client can safely retry an idempotent call after a timeout; POST needs an `Idempotency-Key` the server remembers.
+- [x] **401 vs 403 — what's the difference and why is it a security distinction?**
+      ↳ 401 = identity not established or credentials rejected → "authenticate".
+      ↳ 403 = identity known, permission missing → "don't retry with the same credentials".
+      ↳ Which one you return leaks information: 403 confirms a resource exists, 404 hides it, which is why some APIs return 404 instead.
+- [x] **What is a trust boundary in a backend?**
+      ↳ Any point where data crosses from a less-trusted zone into a more-trusted one: browser→server, edge→internal, service→service, third party→me.
+      ↳ Everything crossing it is untrusted until validated on the server; client-side validation is UX only, since an attacker skips the UI.
+      ↳ Validate on every request, because statelessness means each request must prove itself.
+- [x] **Difference between REST and "an HTTP API"? When would you not use REST?**
+      ↳ REST is a style: resources with URIs, representations (JSON), uniform interface via HTTP methods, statelessness, hypermedia (Link headers).
+      ↳ An HTTP API may just tunnel RPC — `POST /createUser`, verbs in URLs, one endpoint per action.
+      ↳ Skip REST for non-CRUD commands, chatty screens that need one round trip (GraphQL/BFF), and realtime (WebSocket/SSE).
 
 ## Day 2 — Terminal, OS, environment, Git
 
