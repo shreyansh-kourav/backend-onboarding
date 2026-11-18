@@ -9,6 +9,7 @@ Theory notes for this day live in [`docs/day_01/`](../../docs/day_01/):
 | [03. REST APIs](../../docs/day_01/03.%20REST%20APIs.md) | resources, methods, statelessness, idempotency, versioning |
 | [04. Request Validation](../../docs/day_01/04.%20Request%20Validation.md) | trust boundaries, 5 untrusted inputs |
 | [05. File Uploads](../../docs/day_01/05.%20File%20Uploads.md) | magic bytes, path traversal, parser-before-handler, 413 |
+| [06. Headers Security](../../docs/day_01/06.%20Headers%20Security.md) | claims vs facts, proxy headers, cookies, host poisoning, response headers |
 
 This folder is the proof: what I observed, measured, and can reproduce.
 
