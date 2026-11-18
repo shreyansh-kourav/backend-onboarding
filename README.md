@@ -13,7 +13,7 @@ Plan lives in [`docs/plan.md`](docs/plan.md).
 | Day | Topic | Journal | Artifact | Status |
 |:--:|---|---|---|:--:|
 | 1 | Backend fundamentals, web & API basics | [day-01](journal/day-01.md) | [labs/day-01-http](labs/day-01-http/README.md) | ✅ |
-| 2 | Terminal, OS & developer environment | [day-02](journal/day-02.md) | [labs/day-02-terminal](labs/day-02-terminal/README.md) | ☐ |
+| 2 | Terminal, OS & developer environment | [day-02](journal/day-02.md) | [labs/day-02-terminal](labs/day-02-terminal/README.md) | ✅ |
 | 3 | Server, async & API design | [day-03](journal/day-03.md) | `api/` + `docs/api-design.md` | ☐ |
 | 4 | Database, performance & background jobs | [day-04](journal/day-04.md) | `docs/database.md` + `docs/performance.md` | ☐ |
 | 5 | Security, testing & production readiness | [day-05](journal/day-05.md) | `docs/security.md` + CI + Docker | ☐ |

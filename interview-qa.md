@@ -32,16 +32,26 @@ Format: tick the box, replace the `↳` line with your answer.
 
 ## Day 2 — Terminal, OS, environment, Git
 
-- [ ] **SIGTERM vs SIGKILL — why try the polite one first?**
-      ↳
-- [ ] **What does `.gitignore` prevent, and what can it not undo?**
-      ↳
-- [ ] **What is `PATH`, and why does a command "not found" sometimes mean "not on PATH"?**
-      ↳
-- [ ] **`git revert` vs `git reset --hard` — which is safe on a shared branch?**
-      ↳
-- [ ] **Why do secrets belong in env vars instead of source code?**
-      ↳
+- [x] **SIGTERM vs SIGKILL — why try the polite one first?**
+      ↳ SIGTERM is catchable: the process runs a handler, stops accepting work, drains in-flight requests, closes resources, exits 0 — or exits 143 if it has no handler.
+      ↳ SIGKILL cannot be caught: the kernel destroys the process mid-instruction, so nothing is flushed and locks/temp files are left behind.
+      ↳ So: SIGTERM, wait a grace period scaled to your slowest request, escalate to SIGKILL only if it's still alive.
+- [x] **What does `.gitignore` prevent, and what can it not undo?**
+      ↳ It stops **untracked** files from being added — nothing else.
+      ↳ Files already committed stay tracked: `git rm --cached <file>` stops tracking but the content stays in history.
+      ↳ That's why a committed secret must be rotated, not just deleted.
+- [x] **What is `PATH`, and why does a command "not found" sometimes mean "not on PATH"?**
+      ↳ A colon-separated list of directories the shell searches **in order**; first match wins.
+      ↳ "command not found" means no executable of that name was found in any listed directory — missing install, wrong venv, or a directory that was never added.
+      ↳ A venv works by prepending `.venv/bin`, which is why activation is per-shell only.
+- [x] **`git revert` vs `git reset --hard` — which is safe on a shared branch?**
+      ↳ `revert` creates a **new** commit that undoes the target, leaving history intact — safe after pushing.
+      ↳ `reset --hard` moves the branch pointer and discards working-tree changes — local history surgery that erases work from everyone who pulls.
+      ↳ Recovery for a bad reset is `git reflog`, while the old position is still referenced.
+- [x] **Why do secrets belong in env vars instead of source code?**
+      ↳ Source code gets copied, forked, pasted into tickets and captured in logs; git history makes removal impossible without rewriting.
+      ↳ Env vars are injected per environment, so the same image runs in dev and prod with different credentials, and rotation doesn't need a code change.
+      ↳ They're not a vault though — readable at `/proc/<pid>/environ` and inherited by every child, so production secrets belong in a secret manager.
 
 ## Day 3 — Server, async & API design
 
