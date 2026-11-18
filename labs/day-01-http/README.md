@@ -8,6 +8,7 @@ Theory notes for this day live in [`docs/day_01/`](../../docs/day_01/):
 | [02. HTTP](../../docs/day_01/02.%20HTTP.md) | message anatomy, 17 status codes |
 | [03. REST APIs](../../docs/day_01/03.%20REST%20APIs.md) | resources, methods, statelessness, idempotency, versioning |
 | [04. Request Validation](../../docs/day_01/04.%20Request%20Validation.md) | trust boundaries, 5 untrusted inputs |
+| [05. File Uploads](../../docs/day_01/05.%20File%20Uploads.md) | magic bytes, path traversal, parser-before-handler, 413 |
 
 This folder is the proof: what I observed, measured, and can reproduce.
 
